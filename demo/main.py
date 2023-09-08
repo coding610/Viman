@@ -15,7 +15,7 @@ class HomeScene(Scene):
         super().__init__()
         self.surface = RelativeSurface()
 
-        self.surface.new_text(id="maintext", text="Hello World", position=RelativePosition.Center)
+        self.surface.new_text(id="maintext", text="Hi JOOHN", position=RelativePosition.Center)
 
         self.nodes = Group(RelativePosition.BottomLeft, GroupAligment.Horizontal, 10)
         self.nodes.append_objects((
@@ -27,19 +27,19 @@ class HomeScene(Scene):
         )
 
         self.othernodes = Group(RelativePosition.Center, GroupAligment.Horizontal, 10)
-        self.nodes.append_objects(
+        self.othernodes.append_objects(
             (
                 Text("This is automatic"), # id 0
                 Text("Feels soo good"), # id 1
                 Text("Wooohoo"), # id 2
-                copy(self.nodes)
+                copy(self.nodes) # id 3
             ),
-            automatic_ids=True,
-            natural_order=False # Right to left
         )
 
         self.surface.append_group(id="nodes", group=self.nodes)
-        self.surface.append_group(id="othernodes", group=self.nodes)
+        self.surface.append_group(id="othernodes", group=self.othernodes)
+
+        self.surface = super().new_surface("relative", self.surface)
 
 
 App = App((1440, 810), fps=60)

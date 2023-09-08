@@ -13,7 +13,7 @@ class Surface:
         id: str,
         text: str,
         position: RelativePosition | GridPosition | AbsolutePosition = RelativePosition.Center
-    ): self.objects[id] = Text(text, position) # Its the artist job to handle where to place them
+    ): self.objects[id] = Text(text, position=position) # Its the artist job to handle where to place them
 
     # Create object in paramter
     def new_object(
@@ -29,3 +29,6 @@ class RelativeSurface(Surface):
 
     def append_group(self, id: str, group: Group):
         self.groups[id] = group
+        for o in self.groups[id].objects:
+            o = self.groups[id].objects[o]
+            o.position = self.groups[id].position

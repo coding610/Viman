@@ -42,10 +42,10 @@ class Group:
 
         # Auto ids will be ints to differentiate between chosen ids
         if natural_order:
-            for o, id in zip(objects, range(1, len(objects))):
+            for o, id in zip(objects, range(0, len(objects))):
                 if automatic_ids: self.objects[id] = o
                 else: self.objects[o[1]] = o[0]
         else:
-            for o, id in zip(reversed(objects), reversed(range(1, len(objects)))):
+            for o, id in zip(reversed(objects), reversed(range(0, len(objects)))):
                 if automatic_ids: self.objects[id] = o 
                 else: self.objects[o[1]] = o[0]

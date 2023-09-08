@@ -1,15 +1,23 @@
 import pygame
+import os
 from Viman.core.artist import *
 from Viman.scene.scene import *
 from Viman.log.log import *
 
 
 class App:
-    def __init__(self, resolution: tuple, fps: float=60) -> None:
+    def __init__(
+        self,
+        resolution: tuple,
+        name: str=os.getcwd().split("/")[-1],
+        fps: float=60
+    ) -> None:
         self.resolution = resolution
         self.fps = fps
 
         self.__window = pygame.display.set_mode(resolution)
+        pygame.display.set_caption(name)
+
         self.scenes = {}
         self.scene: Scene
 
@@ -22,7 +30,15 @@ class App:
             self.__handle_events()
             self.scene.update()
 
-            self.__window = self.artist.draw(self.scene.surface)
+            self.__window.fill((0, 0, 0))
+
+            for surface in self.scene.surfaces:
+                surface = self.scene.surfaces[surface]
+                self.__window = self.artist.draw(surface)
+
+            self.artist.increment = 0
+
+            pygame.display.update()
 
     # -1 is on top
     # 0 is on bottom
