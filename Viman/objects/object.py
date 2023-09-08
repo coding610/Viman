@@ -1,4 +1,4 @@
 # Thin wrapper around other shapes
-class Shape:
+class Object:
     def __init__(self) -> None:
         pass
