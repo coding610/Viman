@@ -32,7 +32,7 @@ class Group:
         spacing: int=10
     ) -> None:
         self.objects = {}
-        self.order = order
+        self.aligment = order
         self.spacing = spacing
         self.position = position
 

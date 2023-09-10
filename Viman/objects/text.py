@@ -18,10 +18,13 @@ class Text(Object):
         self.position = position
         self.color = color
 
-    def draw(self, window: pygame.surface.Surface, increment) -> pygame.surface.Surface:
-        w, h = window.get_width(), window.get_height()
-        
-        # FIXME
-        self.font.font.render_to(window, (50 * increment, 50 * increment), self.text, self.color)
+        self.currentrender = self.font.font.render(text)[0]
+        self.dims = (self.currentrender.get_width(), self.currentrender.get_height())
+
+    def draw(self, window: pygame.surface.Surface) -> pygame.surface.Surface:
+        self.font.font.render_to(window, (self.absolute_position), self.text, self.color)
 
         return window
+
+    def update_text(self, text):
+        print("NEED TO UPDATE CURRENTRENDER AND DIMS WHEN DOING THIS")

@@ -23,9 +23,10 @@ class Surface:
     ): self.objects[id] = object
 
 class RelativeSurface(Surface):
-    def __init__(self) -> None:
+    def __init__(self, spacing) -> None:
         super().__init__()
         self.groups = {}
+        self.spacing = spacing
 
     def append_group(self, id: str, group: Group):
         self.groups[id] = group

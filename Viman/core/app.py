@@ -36,8 +36,6 @@ class App:
                 surface = self.scene.surfaces[surface]
                 self.__window = self.artist.draw(surface)
 
-            self.artist.increment = 0
-
             pygame.display.update()
 
     # -1 is on top

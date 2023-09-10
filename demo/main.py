@@ -13,7 +13,7 @@ from Viman.scene.scene import *
 class HomeScene(Scene):
     def __init__(self) -> None:
         super().__init__()
-        self.surface = RelativeSurface()
+        self.surface = RelativeSurface(spacing=10)
 
         self.surface.new_text(id="maintext", text="Hi JOOHN", position=RelativePosition.Center)
 
@@ -45,5 +45,4 @@ class HomeScene(Scene):
 App = App((1440, 810), fps=60)
 App.attatch_scene(HomeScene(), target=True)
 
-print("running scene now")
 App.run()
