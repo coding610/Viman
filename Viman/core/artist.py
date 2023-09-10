@@ -16,6 +16,7 @@ class Artist:
             self.__draw_objects(surface.objects, surface.spacing)
             for g in surface.groups:
                 g = surface.groups[g]
+                print(f"OUTSIDE OBJECTS IN GROUPS: {g.objects}")
                 self.__draw_objects(g, surface.spacing)
 
         return self.__window
@@ -29,7 +30,7 @@ class Artist:
 
         if type(group) == Group:
             positions = self.__position_groups(group, spacing)
-            objects = self.__handle_postitions(group, positions)
+            objects = self.__handle_postitions(group, positions).objects
 
         elif type(group) == dict:
             objects = self.__position_objects(objects, spacing)
@@ -46,9 +47,8 @@ class Artist:
         c_objects = []
         for o in group_objects:
             o = group_objects[o]
-            if type(o) == dict:
-                print("group")
-                for g in self.__collapse_group(o):
+            if type(o) == Group:
+                for g in self.__collapse_group(o.objects):
                     c_objects.append(g)
             else:
                 c_objects.append(o)
@@ -110,7 +110,7 @@ class Artist:
 
         return positions
 
-    def __handle_postitions(self, group: Group, positions: list) -> dict:
+    def __handle_postitions(self, group: Group, positions: list) -> Group:
         objects = group.objects
         for o, p in zip(objects, range(len(positions[1]))):
             if type(objects[o]) == Group:
@@ -122,7 +122,8 @@ class Artist:
                     positions[1][p][1] + positions[0][1]
                 )
 
-        return objects
+        group.objects = objects
+        return group
 
     def __adjust_positions(self, objects: dict) -> dict:
         return objects
