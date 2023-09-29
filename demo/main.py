@@ -13,22 +13,26 @@ from Viman.scene.scene import *
 class HomeScene(Scene):
     def __init__(self) -> None:
         super().__init__()
-        self.surface = RelativeSurface(spacing=100)
+        self.surface = RelativeSurface(spacing=10)
 
-        self.surface.new_text(id="maintext", text="Alone object", position=RelativePosition.Center)
+        self.surface.new_text(id="maintext", text="Hi JOOHN", position=RelativePosition.Center)
 
-        self.nodes = Group(RelativePosition.TopRight, GroupAligment.Horizontal, 300)
+        self.nodes = Group(RelativePosition.BottomLeft, GroupAligment.Horizontal, 10)
         self.nodes.append_objects((
-                [Text("Nodes"), "a"],
+                [Text("Hello World"), "a"],
+                [Text("You Know it"), "b"],
+                [Text("Yheaaaaaaaa"), "c"],
             ),
             automatic_ids=False
         )
 
-        self.othernodes = Group(RelativePosition.Center, GroupAligment.Horizontal, 300)
+        self.othernodes = Group(RelativePosition.Center, GroupAligment.Horizontal, 10)
         self.othernodes.append_objects(
             (
-                Text("Othernodes"), # id 0
-                self.nodes
+                Text("This is automatic"), # id 0
+                Text("Feels soo good"), # id 1
+                Text("Wooohoo"), # id 2
+                copy(self.nodes) # id 3
             ),
         )
 

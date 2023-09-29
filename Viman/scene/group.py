@@ -43,20 +43,9 @@ class Group:
         # Auto ids will be ints to differentiate between chosen ids
         if natural_order:
             for o, id in zip(objects, range(0, len(objects))):
-                if automatic_ids:
-                    self.objects[id] = self.__group_to_dict(o)
-                else:
-                    self.objects[o[1]] = self.__group_to_dict(o[0])
+                if automatic_ids: self.objects[id] = o
+                else: self.objects[o[1]] = o[0]
         else:
             for o, id in zip(reversed(objects), reversed(range(0, len(objects)))):
-                if automatic_ids:
-                    self.objects[id] = self.__group_to_dict(o)
-                else:
-                    self.objects[o[1]] = self.__group_to_dict(o[0])
-
-    def __group_to_dict(self, og): # Og is either object or Group
-        if type(og) == Group:
-            for o in og.objects:
-                og.objects[o] = self.__group_to_dict(og.objects)
-
-        return og
+                if automatic_ids: self.objects[id] = o 
+                else: self.objects[o[1]] = o[0]

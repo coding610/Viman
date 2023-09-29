@@ -15,32 +15,40 @@ class Artist:
             # Fix this in the future
             self.__draw_objects(surface.objects, surface.spacing)
             for g in surface.groups:
-                self.__draw_objects(surface.groups[g], surface.spacing)
+                g = surface.groups[g]
+                print(f"OUTSIDE OBJECTS IN GROUPS: {g.objects}")
+                self.__draw_objects(g, surface.spacing)
 
         return self.__window
 
-    def __draw_objects(self, group: dict | Group, surface_spacing: int):
-        if type(group) == Group:
-            objects: dict = group.objects
-            positions = self.__position_groups(group, objects, surface_spacing)
-            objects = self.__handle_postitions(objects, positions) # This both collapses and treats objects
-            objects = self.__adjust_positions(objects)
-        elif type(group) == dict:
-            objects: dict = group
-            objects = self.__position_objects(objects, surface_spacing)
-        else:
-            objects = {}
+    def __draw_objects(self, g: Group | dict, spacing: int):
+        group = copy(g)
 
-        listed_objects: list = self.__list_group(objects)
+        if type(group) == Group: objects: dict = group.objects
+        elif type(group) == dict: objects: dict = group
+        else: objects: dict = {}
+
+        if type(group) == Group:
+            positions = self.__position_groups(group, spacing)
+            objects = self.__handle_postitions(group, positions).objects
+
+        elif type(group) == dict:
+            objects = self.__position_objects(objects, spacing)
+
+        objects = self.__adjust_positions(objects)
+        listed_objects: list = self.__collapse_group(objects)
+
+        print(f"LISTED OBJECTS: {listed_objects}")
+        print(f"OBJECTS: {objects}")
         for o in listed_objects:
             self.__window = o.draw(self.__window)
 
-    def __list_group(self, group_objects: dict) -> list:
+    def __collapse_group(self, group_objects: dict) -> list:
         c_objects = []
         for o in group_objects:
             o = group_objects[o]
-            if type(o) == dict:
-                for g in self.__list_group(o):
+            if type(o) == Group:
+                for g in self.__collapse_group(o.objects):
                     c_objects.append(g)
             else:
                 c_objects.append(o)
@@ -48,70 +56,74 @@ class Artist:
         return c_objects
 
 
-    def __position_objects(self, objects: dict, surface_spacing) -> dict:
+    def __position_objects(self, objects: dict, spacing) -> dict:
         w, h = self.__window.get_width(), self.__window.get_height()
         
         for o in objects:
-            if type(objects[o].position) == dict:
-                objects = self.__position_objects(o.objects, surface_spacing)
+            if type(objects[o].position) == Group:
+                objects = self.__position_objects(o.objects, spacing)
 
             if type(objects[o].position) == RelativePosition:
                 if objects[o].position == RelativePosition.Center:
                     objects[o].absolute_position = (w/2, h/2)
                 elif objects[o].position == RelativePosition.TopLeft:
-                    objects[o].absolute_position = (surface_spacing, surface_spacing)
+                    objects[o].absolute_position = (spacing, spacing)
                 elif objects[o].position == RelativePosition.TopRight:
-                    objects[o].absolute_position = (surface_spacing, w - surface_spacing)
+                    objects[o].absolute_position = (spacing, w - spacing)
                 elif objects[o].position == RelativePosition.BottomLeft:
-                    objects[o].absolute_position = (h - surface_spacing, surface_spacing)
+                    objects[o].absolute_position = (h - spacing, spacing)
                 elif objects[o].position == RelativePosition.BottomRight:
-                    objects[o].absolute_position = (h - surface_spacing, w - surface_spacing)
+                    objects[o].absolute_position = (h - spacing, w - spacing)
 
         return objects
         
     # This will only be on relative surfaces
-    # Group parameter is only for top group params
-    def __position_groups(self, group: Group, objects: dict, surface_spacing) -> list:
+    def __position_groups(self, group: Group, spacing) -> list:
         w, h = self.__window.get_width(), self.__window.get_height()
 
+        objects = group.objects
+
         positions: list = [(), []]
-        current_position = (-surface_spacing, -surface_spacing)
+        current_position = (-spacing, -spacing)
         for o in objects:
-            if type(objects[o]) == dict:
-                positions[1].append([(0, 0), self.__position_groups(group, objects[o], surface_spacing)[1]])
+            if type(objects[o]) == Group:
+                positions[1].append([(0, 0), self.__position_groups(objects[o], spacing)[1]])
             else:
                 if group.aligment == GroupAligment.Horizontal:
+                    positions[1].append(( current_position[0] + group.spacing, 0 ))
                     current_position = ( current_position[0] + group.spacing, 0 )
-                    positions[1].append(current_position)
                 else:
+                    positions[1].append(( 0, current_position[1] + group.spacing ))
                     current_position = ( 0, current_position[1] + group.spacing )
-                    positions[1].append(current_position)
 
         group_position = objects[next(iter(objects))].position
         if group_position == RelativePosition.Center:
             positions[0] = (w/2, h/2)
         elif group_position == RelativePosition.TopLeft:
-            positions[0] = (surface_spacing, surface_spacing)
+            positions[0] = (spacing, spacing)
         elif group_position == RelativePosition.TopRight:
-            positions[0] = (surface_spacing, w - surface_spacing)
+            positions[0] = (spacing, w - spacing)
         elif group_position == RelativePosition.BottomLeft:
-            positions[0] = (h - surface_spacing, surface_spacing)
+            positions[0] = (h - spacing, spacing)
         elif group_position == RelativePosition.BottomRight:
-            positions[0] = (h - surface_spacing, w - surface_spacing)
+            positions[0] = (h - spacing, w - spacing)
 
         return positions
 
-    def __handle_postitions(self, objects: dict, positions: list) -> dict:
+    def __handle_postitions(self, group: Group, positions: list) -> Group:
+        objects = group.objects
         for o, p in zip(objects, range(len(positions[1]))):
-            if type(objects[o]) == dict:
+            if type(objects[o]) == Group:
                 objects[o] = self.__handle_postitions(objects[o], positions[1][p])
             else:
+                print(p, o, type(objects[o]), objects, positions)
                 objects[o].absolute_position = (
                     positions[1][p][0] + positions[0][0],
                     positions[1][p][1] + positions[0][1]
                 )
 
-        return objects
+        group.objects = objects
+        return group
 
     def __adjust_positions(self, objects: dict) -> dict:
         return objects
